@@ -3,7 +3,7 @@ import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 import { LinesMaterial } from './LinesMaterial.js';
 import * as THREE from 'three';
-import noiseTexture from './imgs/image-7.png'; // vite-ee
+import noiseTexture from '../imgs/image-7.png'; // vite-ee
 
 export class LinesPass extends Pass {
 	

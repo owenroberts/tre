@@ -1,9 +1,9 @@
 /*
-	joint for procedural cat
+	joint for animating procedurally
 */
 
 import * as THREE from 'three';
-import * as Cool from '../cool/cool.js';
+import * as Cool from '../../cool/cool.js';
 
 export function Joint() {
 

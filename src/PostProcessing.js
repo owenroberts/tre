@@ -8,13 +8,15 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
+
 import { BandPass } from './BandPass.js';
 import { BandShader } from './BandShader.js';
 
 import { LinesPass } from './LinesPass.js';
-import vertexShader from './vert.glsl';
-import blendShader from './blend.glsl';
 import { Animator } from './Animator.js';
+
+import vertexShader from '../glsl/vert.glsl';
+import blendShader from '../glsl/blend.glsl';
 
 export function PostProcessing(params) {
 

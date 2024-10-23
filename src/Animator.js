@@ -4,7 +4,7 @@
 	works with joint
 */
 
-import * as Cool from '../cool/cool.js';
+import * as Cool from '../../cool/cool.js';
 
 export function Animator(params) {
 
