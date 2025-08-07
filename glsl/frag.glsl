@@ -113,7 +113,6 @@ void main() {
 
 	// vec4 lineColor = vec4(0.32, 0.12, 1.0, 1.0);
 
-
 	if (sobelValue > 0.1) {
 		gl_FragColor = vec4(lineColor, 1.0);
 	} else {

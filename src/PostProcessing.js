@@ -124,7 +124,6 @@ export function PostProcessing(params) {
 
 		// linesPass1.material.uniforms.noiseOffset.value.x = value.x;
 		// linesPass1.material.uniforms.noiseOffset.value.y = value.y;
-
 	}
 
 	function process() {

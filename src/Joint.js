@@ -59,7 +59,8 @@ export function Joint() {
 			tP.z = params.z !== undefined ? params.z : zP;
 			// tP.set(x, y, z);
 		},
-		lerp: timeElapsed => { 
+		lerp: timeElapsed => {
+			// console.log(timeElapsed * lerpSpeed)
 			obj.position.lerp(tP, timeElapsed * lerpSpeed); 
 		},
 		unlerp: timeElapsed => {

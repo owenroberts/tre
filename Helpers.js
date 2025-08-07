@@ -15,13 +15,14 @@ function getTestCube(x, y, z, size=0.5) {
 	return box;
 }
 
-function getArrowHelper(pos) {
-	return new THREE.ArrowHelper(pos.normal, pos.position, 1, 0xff00ff);
+function getArrowHelper(obj) {
+	return new THREE.ArrowHelper(obj.normal, obj.position, 1, 0xff00ff);
 }
 
-function getAxesHelper(pos) {
+function getAxesHelper(position, normal) {
 	const a = new THREE.AxesHelper(5);
-	a.position.copy(pos ?? new THREE.Vector3(0, 0, 0));
+	a.position.copy(position ?? new THREE.Vector3(0, 0, 0));
+	if (normal) a.up.copy(normal);
 	return a;
 }
 

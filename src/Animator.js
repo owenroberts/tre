@@ -1,13 +1,18 @@
 /*
 	this should be a Prop/Mod thing maybe?
 	animate a value over time ...
-	works with joint
+	works with joint'
+
+	should add some notes on different update results, sin, cos, etc
+	increment vs value, range
 */
 
 import * as Cool from '../../cool/cool.js';
 
 export function Animator(params) {
+	if (params.debug) console.log(params)
 
+	let debug = params.debug;
 	let value = params.value ?? 0;
 	let increment = params.increment ?? 1;
 	let func = params.func ?? ((value) => { return value; });
@@ -26,7 +31,7 @@ export function Animator(params) {
 	let valueClamp = params.valueClamp ?? false;
 
 	// console.log(value, increment, randomize, range, min, max);
-
+	// params overwrites params, horrible
 	function update(timeElapsedInSeconds=1, params={}) {
 		
 		params.isCount = false;
@@ -46,6 +51,7 @@ export function Animator(params) {
 		if (valueClamp) {
 			value = value.clamp(...valueClamp);
 		}
+		if (debug) console.log(counter, count, params.isCount);
 		
 		return func(value, params);
 	}
