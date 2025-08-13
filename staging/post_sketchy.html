@@ -1,0 +1,146 @@
+<!-- 
+	example of sketchy pencil effect
+	https://tympanus.net/codrops/2022/11/29/sketchy-pencil-effect-with-three-js-post-processing/
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>tre ~ default three js example</title>
+	<style>
+		body { 
+			margin: 0; 
+			background: black;
+		}
+	</style>
+</head>
+<body>
+	
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+// render stuff
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+
+// my lines pass
+import { LinesPass } from '../src/LinesPass.js';
+
+let debug = false;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+const controls = new OrbitControls( camera, renderer.domElement );
+
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+function addSphere() {
+	const geometry = new THREE.SphereGeometry( 1, 32, 16 ); 
+	const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+	const sphere = new THREE.Mesh( geometry, material ); 
+	sphere.position.set(2, 0, 0);
+	scene.add( sphere );
+}
+addSphere();
+
+
+// setup post processor
+const linesPassData = {
+	lineColor: 0x000000,
+	bgColor: 0xC7C7C7,
+	bgAlpha: 0.0,
+	lineWidth: 1,
+	numLines: 5,
+	diffuseCutoff: 40,
+	normalCutoff: 50,
+	noiseMultiplier: 10,
+};
+
+const linesPass = new LinesPass({
+	scene, 
+	camera,
+	width: renderer.domElement.clientWidth, 
+	height: renderer.domElement.clientHeight, 
+	uniforms: {
+		lineColor: { type: 'vec3', value: new THREE.Color(linesPassData.lineColor) },
+		bgColor: { type: 'vec3', value: new THREE.Color(linesPassData.bgColor) },
+		bgAlpha: { type: 'float', value: linesPassData.bgAlpha },
+		lineWidth: linesPassData.lineWidth,
+		numLines: linesPassData.numLines,
+		diffuseCutoff: { type: 'float', value: linesPassData.diffuseCutoff },
+		normalCutoff: { type: 'float', value: linesPassData.normalCutoff },
+		noiseMultiplier: { type: 'float', value: linesPassData.noiseMultiplier },
+	}
+});
+
+const composer = new EffectComposer(renderer);
+// linesPass is render pass, doesn't need render pass
+composer.addPass(linesPass);
+
+// set up lil-gui
+const gui = new GUI();
+const folder = gui.addFolder( "Shader Uniforms" );
+// https://discourse.threejs.org/t/setting-color-in-3js-code-vs-what-lil-gui-uses/67907/2
+folder.addColor(linesPassData, 'lineColor').onChange(value => {
+	linesPass.material.uniforms.lineColor.value = new THREE.Color().setHex(value, THREE.SRGBColorSpace);
+});
+
+folder.addColor(linesPassData, 'bgColor').onChange(value => {
+	linesPass.material.uniforms.bgColor.value = new THREE.Color().setHex(value, THREE.SRGBColorSpace);
+});
+
+folder.add(linesPassData, 'bgAlpha', 0, 1).onChange(value => {
+	linesPass.material.uniforms.bgAlpha.value = value;
+});
+
+folder.add(linesPassData, 'lineWidth').onChange(value => {
+	linesPass.material.uniforms.lineWidth.value = value;
+});
+
+folder.add(linesPassData, 'numLines').onChange(value => {
+	linesPass.material.uniforms.numLines.value = value;
+});
+
+folder.add(linesPassData, 'diffuseCutoff', 0.1, 100.0).onChange(value => {
+	linesPass.material.uniforms.diffuseCutoff.value = value;
+});
+
+// does really cool stuff but limited range ... 
+folder.add(linesPassData, 'normalCutoff', 0.1, 100.0).onChange(value => {
+	linesPass.material.uniforms.normalCutoff.value = value;
+});
+
+folder.add(linesPassData, 'noiseMultiplier', 0.1, 100.0).onChange(value => {
+	linesPass.material.uniforms.noiseMultiplier.value = value;
+});
+
+
+
+
+
+
+function animate() {
+	if (debug) renderer.render(scene, camera);
+	else composer.render();
+
+	cube.rotation.x += 0.01;
+	cube.rotation.y += 0.01;
+}
+renderer.setAnimationLoop( animate );
+
+</script>
+</body>
+</html>
