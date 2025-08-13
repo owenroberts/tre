@@ -1,9 +1,13 @@
-// https://tympanus.net/codrops/2022/11/29/sketchy-pencil-effect-with-three-js-post-processing/
+/* based on
+https://tympanus.net/codrops/2022/11/29/sketchy-pencil-effect-with-three-js-post-processing/
+*/
+
+import * as THREE from 'three';
 import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+
 import { LinesMaterial } from './LinesMaterial.js';
-import * as THREE from 'three';
-import noiseTexture from '../imgs/image-7.png'; // vite-ee
+import noiseTexture from './images/image-7.png'; // vite-ee
 
 export class LinesPass extends Pass {
 	
@@ -22,18 +26,17 @@ export class LinesPass extends Pass {
 		normalBuffer.texture.type = THREE.HalfFloatType;
 		// normalBuffer.texture.type = THREE.UnsignedShort4444Type;
 		// this breaks the particles but idk what it does ... 
+		// also adds weird grid, but there are other types
 
 		normalBuffer.texture.minFilter = THREE.NearestFilter;
 		normalBuffer.texture.magFilter = THREE.NearestFilter;
-		normalBuffer.texture.generateMipmaps = false;
+		normalBuffer.texture.generateMipmaps = false; // idk
 		normalBuffer.stencilBuffer = false;
 		this.normalBuffer = normalBuffer;
 		this.normalMaterial = new THREE.MeshNormalMaterial();
-		// this.needsSwap = false;
-		// this.material.uniforms.uTexture.value = texture;
+		// this.needsSwap = false; // idk
 
 		const loader = new THREE.TextureLoader();
-		// loader.load('./imgs/image-7.png', texture => {
 		loader.load(noiseTexture, texture => {
 			this.material.uniforms.uTexture.value = texture;
 		});
@@ -64,10 +67,12 @@ export class LinesPass extends Pass {
 		this.material.uniforms.uNormals.value = this.normalBuffer.texture;
 		this.material.uniforms.tDiffuse.value = readBuffer.texture;
 		
+		// why would this ever not be renderToScreen?
 		if (this.renderToScreen) {
 			renderer.setRenderTarget(null);
 			this.fsQuad.render(renderer);
 		} else {
+			throw Error("You don't think this ever happens but now it did!");
 			renderer.setRenderTarget(writeBuffer);
 			if (this.clear) renderer.clear();
 			this.fsQuad.render(renderer);
