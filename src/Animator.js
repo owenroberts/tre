@@ -1,60 +1,202 @@
-/*
-	this should be a Prop/Mod thing maybe?
-	animate a value over time ...
-	works with joint'
+import { map, random } from '../../cool/cool.js';
 
-	should add some notes on different update results, sin, cos, etc
-	increment vs value, range
-*/
+/**
+ * easing types, from https://easings.net/
+ * https://github.com/ai/easings.net/blob/master/src/easings/easingsFunctions.ts
+ * @enum {number}
+ */
+export const Easings = {
+	LINEAR: 0,
+	SINE_IN: 1,
+	SINE_OUT: 2,
+	SINE_IN_OUT: 3,
+	CUBIC_IN: 4,
+	CUBIC_OUT: 5,
+	CUBIC_IN_OUT: 6,
+	BACK_IN: 7,
+	BACK_OUT: 8,
+	BACK_IN_OUT: 9,
+	ELASTIC_IN: 10,
+	ELASTIC_OUT: 11,
+	ELASTIC_IN_OUT: 12,
+	BOUNCE_IN: 13,
+	BOUNCE_OUT: 14,
+	BOUNCE_IN_OUT: 15,
+};
 
-import * as Cool from '../../cool/cool.js';
+const EaseConsts = {
+	C1: 1.70158,
+	C2: 1.70158 * 1.525,
+	C3: 1.70158 + 1,
+	C4: (2 * Math.PI) / 3,
+	C5: (2 * Math.PI) / 4.5,
+};
 
-export function Animator(params) {
-	if (params.debug) console.log(params)
+/**
+ * animator class
+ * takes start and end value and animates
+ * randomize option (clamp?)
+ * update in animate, callback fn so anim is described when created
+ */
+export class Animator {
 
-	let debug = params.debug;
-	let value = params.value ?? 0;
-	let increment = params.increment ?? 1;
-	let func = params.func ?? ((value) => { return value; });
+	constructor({ 
+		start=0, 
+		end=1,
+		duration=1, // in seconds
+		randomize=false,
+		randomFactor=0.1,
+		clamp=true, 
+		loop=true,
+		mirror=true,
+		easing=Easings.LINEAR,
+		callback 
+	}) {
 
-	let counter = 0;
-	let count = params.count ?? 0;
-
-	// random range randomizes the increment
-	let range = params.randomRange ?? [0, 0];
-	let randomize = Math.abs(range[0]) + Math.abs(range[1]) !== 0;
-
-	// clamp range clamps the increment
-	let min = params.clampRange ? increment + params.clampRange[0] : 0;
-	let max = params.clampRange ? increment + params.clampRange[1] : 1;
-
-	let valueClamp = params.valueClamp ?? false;
-
-	// console.log(value, increment, randomize, range, min, max);
-	// params overwrites params, horrible
-	function update(timeElapsedInSeconds=1, params={}) {
+		Object.assign(this, { start, end, duration, randomize, clamp, loop, mirror, easing, callback });
 		
-		params.isCount = false;
-		params.timeElapsedInSeconds = timeElapsedInSeconds;
+		this.progress = 0;
+		this.dir = 1; // for mirroring
 
-		if (counter === count) {
-			value += increment * timeElapsedInSeconds;
-			if (randomize) {
-				increment = (increment + Cool.random(...range)).clamp(min, max);
-			}
-			counter = 0;
-			params.isCount = true;
-		} else {
-			counter++;
-		}
-
-		if (valueClamp) {
-			value = value.clamp(...valueClamp);
-		}
-		if (debug) console.log(counter, count, params.isCount);
-		
-		return func(value, params);
+		let r = Math.abs((this.end - this.start) * randomFactor); 
+		this.randomRange = [-r, r];
+		this.originalRange = [this.start, this.end];
 	}
 
-	return { update };
+	getEasingValue() {
+		let x = this.progress / this.duration; // 0 - 1 progress of animation
+
+		if (this.easing === Easings.LINEAR) return x;
+
+		if (this.easing === Easings.SINE_IN) {
+			return 1 - Math.cos((x * Math.PI) / 2);
+		}
+
+		if (this.easing === Easings.SINE_OUT) {
+			return Math.sin((x * Math.PI) / 2);
+		}
+
+		if (this.easing === Easings.SINE_IN_OUT) {
+			return -(Math.cos(Math.PI * x) - 1) / 2;
+		}
+		
+		if (this.easing === Easings.CUBIC_IN) {
+			return x * x * x;
+		}
+
+		if (this.easing === Easings.CUBIC_OUT) {
+			return 1 - Math.pow(1 - x, 3);
+		}
+
+		if (this.easing === Easings.CUBIC_IN_OUT) {
+			return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+		}
+
+		if (this.easing === Easings.BACK_IN) {
+			return EaseConsts.C3 * x * x * x - EaseConsts.C1 * x * x;
+		}
+
+		if (this.easing === Easings.BACK_OUT) {
+			return 1 + EaseConsts.C3 * Math.pow(x - 1, 3) + EaseConsts.C1 * Math.pow(x - 1, 2);
+		}
+
+		if (this.easing === Easings.BACK_IN_OUT) {
+			return x < 0.5
+				? (Math.pow(2 * x, 2) * ((EaseConsts.C2 + 1) * 2 * x - EaseConsts.C2)) / 2
+				: (Math.pow(2 * x - 2, 2) * ((EaseConsts.C2 + 1) * (x * 2 - 2) + EaseConsts.C2) + 2) / 2;
+		}
+
+		if (this.easing === Easings.ELASTIC_IN) {
+			return x === 0
+				? 0
+				: x === 1
+				? 1
+				: -Math.pow(2, 10 * x - 10) * Math.sin((x * 10 - 10.75) * EaseConsts.C4);
+		}
+
+		if (this.easing === Easings.ELASTIC_OUT) {
+			return x === 0
+				? 0
+				: x === 1
+				? 1
+				: Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * EaseConsts.C4) + 1;
+		}
+
+		if (this.easing === Easings.ELASTIC_IN_OUT) {
+			return x === 0
+				? 0
+				: x === 1
+				? 1
+				: x < 0.5
+				? -(Math.pow(2, 20 * x - 10) * Math.sin((20 * x - 11.125) * EaseConsts.C5)) / 2
+				: (Math.pow(2, -20 * x + 10) * Math.sin((20 * x - 11.125) * EaseConsts.C5)) / 2 + 1;
+		}
+
+		if (this.easing === Easings.BOUNCE_IN) {
+			return 1 - this.bounceOut(1 - x);
+		}
+
+		if (this.easing === Easings.BOUNCE_OUT) {
+			return this.bounceOut(x);
+		}
+
+		if (this.easing === Easings.BOUNCE_IN_OUT) {
+			return x < 0.5
+				? (1 - this.bounceOut(1 - 2 * x)) / 2
+				: (1 + this.bounceOut(2 * x - 1)) / 2;
+		}
+	}
+
+	bounceOut(x) {
+		const n1 = 7.5625;
+		const d1 = 2.75;
+		if (x < 1 / d1) {
+			return n1 * x * x;
+		} else if (x < 2 / d1) {
+			return n1 * (x -= 1.5 / d1) * x + 0.75;
+		} else if (x < 2.5 / d1) {
+			return n1 * (x -= 2.25 / d1) * x + 0.9375;
+		} else {
+			return n1 * (x -= 2.625 / d1) * x + 0.984375;
+		}
+	}
+
+	update(timeElapsedInSeconds) {
+		this.progress += timeElapsedInSeconds * this.dir;
+
+		let value = map(this.getEasingValue(), 0, 1, this.start, this.end, this.clamp);
+		
+		// this is kind of glitchy can smooth this or use joint smoothing ... idk
+		if (this.randomize) {
+			this.end += random(this.randomRange[0], this.randomRange[1]);
+			
+			if (this.clamp && this.end < this.originalRange[0]) {
+				this.end = this.originalRange[0];
+			}
+
+			if (this.clamp && this.end > this.originalRange[1]) {
+				this.end = this.originalRange[1];
+			}
+		}
+		
+		if (this.progress >= this.duration && this.dir === 1) {
+			if (this.mirror) {
+				this.dir = -1;
+			} else if (this.loop) {
+				this.progress = 0;
+			}
+		}
+
+		if (this.progress <= 0 && this.dir === -1 && this.loop) {
+			this.dir = 1;
+			this.progress = 0;
+		}
+
+		this.callback(value);
+	}
+
+	reset() {
+		this.progress = 0;
+		this.dir = 1;
+	}
 }

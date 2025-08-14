@@ -6,7 +6,6 @@ varying vec2 vUv;
 uniform vec3 lineColor;
 uniform vec3 bgColor;
 uniform float bgAlpha;
-uniform vec2 noiseOffset;
 uniform float diffuseCutoff;
 uniform float normalCutoff;
 uniform float noiseMultiplier;
@@ -16,13 +15,16 @@ uniform float noiseMultiplier;
 vec2 grad( ivec2 z ) 
 {
 	// 2D to 1D  (feel free to replace by some other)
+	// cool fx playing with this number ...
 	int n = z.x+z.y*11111;
 
 	// Hugo Elias hash (feel free to replace by another one)
+	// play with 16 here
 	n = (n<<13)^n;
 	n = (n*(n*n*15731+789221)+1376312589)>>16;
 
 	// Perlin style vectors
+	// play with 7 here
 	n &= 7;
 	vec2 gr = vec2(n&1,n>>1)*2.0-1.0;
 	return ( n>=6 ) ? vec2(0.0,gr.x) : 
@@ -51,7 +53,7 @@ float valueAtPoint(sampler2D image, vec2 coord, vec2 texel, vec2 point) {
 float diffuseValue(int x, int y) {
 	float cutoff = diffuseCutoff;
 	float offset = 0.5 / cutoff;
-	float noiseValue = clamp(texture(uTexture, vUv).r, noiseOffset.x, cutoff) / cutoff - offset;
+	float noiseValue = clamp(texture(uTexture, vUv).r, 0.0, cutoff) / cutoff - offset;
 
 	return valueAtPoint(tDiffuse, vUv + noiseValue, vec2(1.0 / uResolution.x, 1.0 / uResolution.y), vec2(x, y)) * 0.6;
 }
@@ -59,8 +61,9 @@ float diffuseValue(int x, int y) {
 float normalValue(int x, int y) {
 	float cutoff = normalCutoff;
 	float offset = 0.5 / cutoff;
-	float noiseValue = clamp(texture(uTexture, vUv).r, noiseOffset.y, cutoff) / cutoff - offset;
+	float noiseValue = clamp(texture(uTexture, vUv).r, 0.0, cutoff) / cutoff - offset;
 
+	// 0.3 also change noise amount or coverage
 	return valueAtPoint(uNormals, vUv + noiseValue, vec2(1.0 / uResolution.x, 1.0 / uResolution.y), vec2(x, y)) * 0.3;
 }
 
@@ -72,6 +75,7 @@ float getValue(int x, int y) {
 }
 
 float combinedSobelValue() {
+	// playing with matrix, some cool ghosty fx
 	// kernel definition (in glsl matrices are filled in column-major order)
 	const mat3 Gx = mat3(-1, -2, -1, 0, 0, 0, 1, 2, 1);// x direction kernel
 	const mat3 Gy = mat3(-1, 0, 1, -2, 0, 2, -1, 0, 1);// y direction kernel
@@ -110,6 +114,7 @@ float combinedSobelValue() {
 
 void main() {
 	float sobelValue = combinedSobelValue();
+	// thin lines with greater threshold
 	sobelValue = smoothstep(0.01, 0.03, sobelValue);
 
 	// vec4 lineColor = vec4(0.32, 0.12, 1.0, 1.0);

@@ -1,0 +1,80 @@
+/* based on
+https://tympanus.net/codrops/2022/11/29/sketchy-pencil-effect-with-three-js-post-processing/
+*/
+
+import * as THREE from 'three';
+import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+
+import { TeddyMaterial } from './TeddyMaterial.js';
+import noiseTexture from './images/image-7.png'; // vite-ee
+
+export class TeddyPass extends Pass {
+	
+	constructor({ width, height, scene, camera, uniforms }) {
+		super();
+
+		this.scene = scene;
+		this.camera = camera;
+		
+		this.material = new TeddyMaterial({ uniforms });
+		this.fsQuad = new FullScreenQuad(this.material);
+		this.material.uniforms.uResolution.value = new THREE.Vector2(width, height);
+
+		const normalBuffer = new THREE.WebGLRenderTarget(width, height);
+		normalBuffer.texture.format = THREE.RGBAFormat;
+		normalBuffer.texture.type = THREE.HalfFloatType;
+		// normalBuffer.texture.type = THREE.UnsignedShort4444Type;
+		// this breaks the particles but idk what it does ... 
+		// also adds weird grid, but there are other types
+
+		normalBuffer.texture.minFilter = THREE.NearestFilter;
+		normalBuffer.texture.magFilter = THREE.NearestFilter;
+		normalBuffer.texture.generateMipmaps = false; // idk
+		normalBuffer.stencilBuffer = false;
+		this.normalBuffer = normalBuffer;
+		this.normalMaterial = new THREE.MeshNormalMaterial();
+		// this.needsSwap = false; // idk
+
+		const loader = new THREE.TextureLoader();
+		loader.load(noiseTexture, texture => {
+			this.material.uniforms.uTexture.value = texture;
+		});
+	}
+
+	setSize(width, height) {
+		this.material.uniforms.uResolution.value = new THREE.Vector2(width, height);
+		this.normalBuffer.setSize(width, height);
+	}
+
+	dispose() {
+		this.material.dispose();
+		this.fsQuad.dispose();
+	}
+
+	render(renderer, writeBuffer, readBuffer) {
+		
+		// this.material.uniforms['tDiffuse'].value = readBuffer.texture;
+		renderer.setRenderTarget(this.normalBuffer);
+		
+		const overrideMaterialValue = this.scene.overrideMaterial;
+		
+		this.scene.overrideMaterial = this.normalMaterial;
+		renderer.render(this.scene, this.camera);
+		this.scene.overrideMaterial = overrideMaterialValue;
+
+		this.material.uniforms.uNormals.value = this.normalBuffer.texture;
+		this.material.uniforms.tDiffuse.value = readBuffer.texture;
+		
+		// why would this ever not be renderToScreen?
+		if (this.renderToScreen) {
+			renderer.setRenderTarget(null);
+			this.fsQuad.render(renderer);
+		} else {
+			throw Error("You don't think this ever happens but now it did!");
+			renderer.setRenderTarget(writeBuffer);
+			if (this.clear) renderer.clear();
+			this.fsQuad.render(renderer);
+		}
+	}
+}

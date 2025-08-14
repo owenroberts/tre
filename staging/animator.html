@@ -1,0 +1,104 @@
+<!-- 
+	basic animator example
+	kind of need to rework animator, should need so much work on the api end ... it should take a start value, end value, time and then loop or other params?
+	also should be class .. jesus christ
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>tre ~ default three js example</title>
+	<style>
+		body { margin: 0; }
+	</style>
+</head>
+<body>
+	
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+import { SceneBuilder } from '../src/staging/SceneBuilder.js';
+import { Easings, Animator } from '../src/Animator.js';
+
+const sceneData = {
+	debug: false,
+};
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild( renderer.domElement );
+
+const controls = new OrbitControls( camera, renderer.domElement );
+
+const builder = new SceneBuilder(scene);
+builder.addGround();
+builder.addLights();
+
+const cube = builder.addCube();
+const sphere = builder.addSphere({ x: 2, s: 0.5 });
+
+// recreate the cube animation with animator
+const cubeAnimator = new Animator({
+	end: Math.PI * 2,
+	duration: 5,
+	mirror: false,
+	callback: value => {
+		cube.rotation.y = value;
+		cube.rotation.x = value;
+	}
+});
+
+const sphereAnimator = new Animator({
+	start: 0,
+	end: 2,
+	duration: 3,
+	// randomize: true,
+	easing: Easings.SINE_IN_OUT,
+	callback: value => {
+		// console.log(value);
+		sphere.position.y = value;
+	}
+});
+
+// set up lil-gui
+const gui = new GUI();
+const sceneGUI = gui.addFolder("Scene");
+sceneGUI.close();
+sceneGUI.add(sceneData, 'debug');
+
+const easingFolder = gui.addFolder( "Sphere" );
+easingFolder.add(sphereAnimator, 'easing', Easings);
+easingFolder.add(sphereAnimator, 'clamp');
+easingFolder.add(sphereAnimator, 'randomize');
+
+let prevTime;
+function animate(time) {
+	if (!prevTime) prevTime = time;
+	const timeElapsed = time - prevTime;
+	prevTime = time;
+	const timeElapsedInSeconds = timeElapsed / 1000;
+
+	renderer.render( scene, camera );
+ 	// cube.rotation.x += 0.01;
+	// cube.rotation.y += 0.01;
+	
+	// cubeAnimator.update(timeElapsedInSeconds);
+	sphereAnimator.update(timeElapsedInSeconds);
+
+}
+renderer.setAnimationLoop( animate );
+
+</script>
+</body>
+</html>

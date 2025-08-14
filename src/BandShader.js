@@ -44,8 +44,8 @@ const BandShader = {
 		void main() {
 			vec4 texel = texture2D( tDiffuse, vUv );
 			vec3 color = vec3(band(texel.r), band(texel.g), band(texel.b));
-			float noise = (noiseBlend) * gradientNoise(gl_FragCoord.xy) - (noiseBlend / 2.0);
-			color *= noise * 4.0;
+			float noise = (noiseBlend) * (gradientNoise(gl_FragCoord.xy) - (noiseBlend / 2.0));
+			color *= noise * 5.0;
 			gl_FragColor = vec4(color, 1.0);
 		}`
 

@@ -1,6 +1,5 @@
 <!-- 
-	example of sketchy pencil effect
-	https://tympanus.net/codrops/2022/11/29/sketchy-pencil-effect-with-three-js-post-processing/
+	same as post_sketchy, with only shader no render pass
  -->
 
 <!DOCTYPE html>
@@ -27,11 +26,12 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 // render stuff
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+
 
 // my lines pass
-import { LinesPass } from '../src/LinesPass.js';
-
-import { getDefaultScene } from '../src/staging/getDefaultScene.js';
+import { LinesMaterial } from '../src/LinesMaterial.js';
+import noiseTexture from '../src/images/image-7.png';
 
 const sceneData = {
 	debug: false,
@@ -53,7 +53,58 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild( renderer.domElement );
 
 const controls = new OrbitControls( camera, renderer.domElement );
-getDefaultScene(scene);
+
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+cube.castShadow = true;
+scene.add( cube );
+
+function addSphere() {
+	const geometry = new THREE.SphereGeometry( 1, 32, 16 ); 
+	const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+	const sphere = new THREE.Mesh( geometry, material ); 
+	sphere.castShadow = true;
+	sphere.position.set(2, 0, 0);
+	scene.add( sphere );
+}
+addSphere();
+
+function addTorus() {
+	const geometry = new THREE.TorusKnotGeometry(.5, 0.2, 200, 32);
+	const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+	const torus = new THREE.Mesh(geometry, material);
+	torus.castShadow = true;
+	torus.rotation.y = Math.PI / 4;
+	torus.position.set(-2, 0, 0);
+	scene.add(torus);
+}
+addTorus();
+
+function addPlane() {
+	const plane = new THREE.Mesh(
+		new THREE.PlaneGeometry(10, 10),
+		new THREE.MeshStandardMaterial({ color: 0xffffff })
+	);
+	plane.rotation.x = -Math.PI / 2;
+	plane.position.y = -1;
+	plane.receiveShadow = true;
+	scene.add(plane);
+}
+addPlane();
+
+function addLight() {
+	const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+	directionalLight.castShadow = true;
+	directionalLight.position.set(2, 2, 2);
+	directionalLight.shadow.mapSize.width = 2048;
+	directionalLight.shadow.mapSize.height = 2048;
+	scene.add(directionalLight);
+
+	const hemisphereLight = new THREE.HemisphereLight(0x7a3114, 0x48c3ff, 0.5);
+	scene.add(hemisphereLight);
+}
+addLight();
 
 // setup post processor
 const linesPassData = {
@@ -67,25 +118,21 @@ const linesPassData = {
 	normalNoiseOffset: 0.0,
 };
 
-const linesPass = new LinesPass({
-	scene, 
-	camera,
-	width: renderer.domElement.clientWidth, 
-	height: renderer.domElement.clientHeight, 
-	uniforms: {
-		lineColor: { type: 'vec3', value: new THREE.Color(linesPassData.lineColor) },
-		bgColor: { type: 'vec3', value: new THREE.Color(linesPassData.bgColor) },
-		bgAlpha: { type: 'float', value: linesPassData.bgAlpha },
-		diffuseCutoff: { type: 'float', value: linesPassData.diffuseCutoff },
-		normalCutoff: { type: 'float', value: linesPassData.normalCutoff },
-		noiseMultiplier: { type: 'float', value: linesPassData.noiseMultiplier },
-	}
-});
-
 const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scene, camera); // need render pass for shadows, diffuse cutoff
 composer.addPass(renderPass);
-composer.addPass(linesPass);
+
+const linesMaterial = new LinesMaterial({ uniforms: linesPassData });
+const loader = new THREE.TextureLoader();
+loader.load(noiseTexture, texture => {
+	linesMaterial.uniforms.uTexture.value = texture;
+});
+
+
+const linesPass = new ShaderPass( linesMaterial );
+composer.addPass( linesPass );
+
+
 
 // set up lil-gui
 const gui = new GUI();
@@ -126,8 +173,8 @@ function animate() {
 	if (sceneData.debug) renderer.render(scene, camera);
 	else composer.render();
 
-	scene.cube.rotation.x += 0.01;
-	scene.cube.rotation.y += 0.01;
+	cube.rotation.x += 0.01;
+	cube.rotation.y += 0.01;
 }
 renderer.setAnimationLoop( animate );
 

@@ -8,6 +8,7 @@ import * as Cool from '../../cool/cool.js';
 export function Joint() {
 
 	const obj = new THREE.Object3D();
+	
 	const oQ = new THREE.Quaternion(); // original quat
 	const tQ = new THREE.Quaternion(); // target quat
 	const tE = new THREE.Euler(); // target euler for copying

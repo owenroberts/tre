@@ -18,7 +18,6 @@ export class LinesMaterial extends THREE.ShaderMaterial {
 				tDiffuse: { value: null },
 				uNormals: { value: null },
 				uTexture: { value: null },
-				noiseOffset: { value: new THREE.Vector2(0.5, 0) },
 				uResolution: { value: new THREE.Vector2(1, 1) },
 			},
 		vertexShader,
