@@ -1,0 +1,125 @@
+<!-- 
+	demo of simple joint + animator
+	head from joint.html with mouth animation
+	based on "singers" in four composition no. three
+	joint has rotate speed to use smoothing, it can be out of wack but should basically try to match the speeds
+	randomize + joint is okay but needs work ...
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>tre ~ default three js example</title>
+	<style>
+		body { margin: 0; }
+	</style>
+</head>
+<body>
+	
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+import { SceneBuilder } from '../src/staging/SceneBuilder.js';
+import { Easings, Animator } from '../src/Animator.js';
+import { Joint } from '../src/Joint.js';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild( renderer.domElement );
+
+const controls = new OrbitControls( camera, renderer.domElement );
+
+const builder = new SceneBuilder(scene);
+builder.addGround();
+builder.addLights();
+
+const j = new Joint();
+j.debug(scene);
+j.setPosition(0, 0.3, 0);
+j.rotateY(Math.PI * -0.25);
+scene.add(j.obj);
+
+const top = builder.addCube();
+top.position.set(0, 0.5, 0.5);
+j.add(top);
+
+const bottom = new Joint();
+const m = builder.addCube();
+bottom.add(m);
+m.position.set(0, -0.5, 0.5);
+bottom.rotateX(Math.PI * 0.1);
+bottom.setOrigins();
+j.add(bottom);
+
+const animation = {
+	isActive: false,
+};
+
+const bottomAnim = new Animator({
+	start: Math.PI * 0.0125,
+	end: Math.PI * 0.25,
+	duration: 1,
+	// randomize: true,
+	randomFactor: 0.5,
+	callback: value => {
+		// console.log(value);
+		if (animation.isActive) {
+			bottom.setTargetRotation({ x: value });
+			bottom.rotate();
+		} else {
+			bottom.unrotate();
+		}
+	}
+});
+
+const gui = new GUI();
+const jf = gui.addFolder("Joint").close();
+const af = gui.addFolder("Animation").close();
+
+jf.add(bottom, 'rotateStep', 0.001, 1); // mostly ignore this
+
+af.add(animation, 'isActive');
+
+af.add(bottomAnim, 'duration', 0.1, 24);
+af.add(bottomAnim, 'easing', Easings);
+af.add(bottomAnim, 'clamp');
+af.add(bottomAnim, 'loop');
+af.add(bottomAnim, 'mirror');
+af.add(bottomAnim, 'randomize');
+af.add(bottomAnim, 'randomFactor', 0.1, 1).onChange(() => {
+	bottomAnim.setRandoms();
+});
+af.add(bottomAnim, 'step', 0.0, 0.2, 0.01);
+af.add(bottomAnim, 'frameCount', 1, 24, 1);
+af.add(bottomAnim, 'reset');
+
+
+let prevTime;
+function animate(time) {
+	if (!prevTime) prevTime = time;
+	const timeElapsed = time - prevTime;
+	prevTime = time;
+	const timeElapsedInSeconds = timeElapsed / 1000;
+
+	renderer.render( scene, camera );
+ 	// cube.rotation.x += 0.01;
+	// cube.rotation.y += 0.01;
+	// 
+	bottomAnim.update(timeElapsedInSeconds);
+}
+renderer.setAnimationLoop( animate );
+
+</script>
+</body>
+</html>

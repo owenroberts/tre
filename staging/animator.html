@@ -63,10 +63,9 @@ const sphereAnimator = new Animator({
 	start: 0,
 	end: 2,
 	duration: 3,
-	// randomize: true,
-	easing: Easings.SINE_IN_OUT,
+	loop: false,
+	easing: Easings.LINEAR,
 	callback: value => {
-		// console.log(value);
 		sphere.position.y = value;
 	}
 });
@@ -77,10 +76,16 @@ const sceneGUI = gui.addFolder("Scene");
 sceneGUI.close();
 sceneGUI.add(sceneData, 'debug');
 
-const easingFolder = gui.addFolder( "Sphere" );
+const easingFolder = gui.addFolder( "Sphere Animator" );
+easingFolder.add(sphereAnimator, 'duration', 0.1, 24);
 easingFolder.add(sphereAnimator, 'easing', Easings);
 easingFolder.add(sphereAnimator, 'clamp');
+easingFolder.add(sphereAnimator, 'loop');
+easingFolder.add(sphereAnimator, 'mirror');
 easingFolder.add(sphereAnimator, 'randomize');
+easingFolder.add(sphereAnimator, 'step', 0.0, 0.2, 0.01);
+easingFolder.add(sphereAnimator, 'frameCount', 1, 24, 1);
+easingFolder.add(sphereAnimator, 'reset');
 
 let prevTime;
 function animate(time) {
@@ -90,8 +95,8 @@ function animate(time) {
 	const timeElapsedInSeconds = timeElapsed / 1000;
 
 	renderer.render( scene, camera );
- 	// cube.rotation.x += 0.01;
-	// cube.rotation.y += 0.01;
+ 	cube.rotation.x += 0.01;
+	cube.rotation.y += 0.01;
 	
 	// cubeAnimator.update(timeElapsedInSeconds);
 	sphereAnimator.update(timeElapsedInSeconds);

@@ -5,7 +5,8 @@ import { resolve } from 'path';
 import vitePluginString from 'vite-plugin-string';
 
 export default defineConfig({
-	base: "./",
+	server: { port: 3333 },
+	// base: "./",
 	plugins: [vitePluginString()],
 	build: {
 		chunkSizeWarningLimit: 600,

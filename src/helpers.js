@@ -19,8 +19,8 @@ function getArrowHelper(obj) {
 	return new THREE.ArrowHelper(obj.normal, obj.position, 1, 0xff00ff);
 }
 
-function getAxesHelper(position, normal) {
-	const a = new THREE.AxesHelper(5);
+function getAxesHelper(position, normal, size=2) {
+	const a = new THREE.AxesHelper(size);
 	a.position.copy(position ?? new THREE.Vector3(0, 0, 0));
 	if (normal) a.up.copy(normal);
 	return a;
