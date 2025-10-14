@@ -1,0 +1,76 @@
+<!-- 
+	demo of bird from longies3d/two, i dont know whats going to happen
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>tre ~ bird</title>
+	<style>
+		body { margin: 0; }
+	</style>
+</head>
+<body>
+
+<script type="module">
+
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+import { Easings, Animator, Joint, Bird } from '../src/tre.js';
+import { SceneBuilder } from '../src/staging/SceneBuilder.js';
+import { setupPostProcessing } from '../src/staging/setupPostProcessing';
+
+const sceneData = {
+	debug: false,
+	sketchy: true,
+};
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild( renderer.domElement );
+
+const controls = new OrbitControls( camera, renderer.domElement );
+
+const builder = new SceneBuilder(scene);
+builder.addGround();
+builder.addLights();
+
+const gui = new GUI();
+const sceneGUI = gui.addFolder("Scene");
+sceneGUI.add(sceneData, 'debug');
+sceneGUI.add(sceneData, 'sketchy');
+
+const composer = setupPostProcessing({ scene, camera, renderer, gui })
+
+// add bird
+const bird = new Bird();
+scene.add(bird.model);
+
+let prevTime;
+function animate(time) {
+	if (!prevTime) prevTime = time;
+	const timeElapsed = time - prevTime;
+	prevTime = time;
+	const timeElapsedInSeconds = timeElapsed / 1000;
+
+	if (sceneData.sketchy) composer.render();
+	else renderer.render(scene, camera);
+
+	bird.update(timeElapsedInSeconds);
+
+}
+renderer.setAnimationLoop( animate );
+
+</script>
+</body>
+</html>

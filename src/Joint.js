@@ -39,8 +39,16 @@ export class Joint {
 		this.obj.position.set(x, y, z);
 	}
 
+	addPosition(x, y, z) {
+		this.obj.position.x += x;
+		this.obj.position.y += y;
+		this.obj.position.z += z;
+	}
+
 	setTargetRotation(r) {
 		if (r.hasOwnProperty('x')) this.tE.x = r.x;
+		if (r.hasOwnProperty('y')) this.tE.y = r.y;
+		if (r.hasOwnProperty('z')) this.tE.z = r.z;
 		this.tQ.setFromEuler(this.tE);
 	}
 
@@ -57,6 +65,13 @@ export class Joint {
 	rotateX(a) { this.obj.rotateX(a); }
 	rotateY(a) { this.obj.rotateY(a); }
 	rotateZ(a) { this.obj.rotateZ(a); }
+
+	setRotation(r) {
+		if (r.hasOwnProperty('x')) this.tE.x = r.x;
+		if (r.hasOwnProperty('y')) this.tE.y = r.y;
+		if (r.hasOwnProperty('z')) this.tE.z = r.z;
+		this.obj.quaternion.setFromEuler(this.tE);
+	}
 
 	setOrigins() {
 		this.oP.copy(this.obj.position);

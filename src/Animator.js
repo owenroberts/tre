@@ -56,6 +56,7 @@ export class Animator {
 	constructor({ 
 		start=0, 
 		end=1,
+		progress=0, // start mid animation
 		duration=1, // in seconds
 		randomize=false,
 		randomFactor=0.1,
@@ -68,9 +69,8 @@ export class Animator {
 		callback 
 	}) {
 
-		Object.assign(this, { start, end, duration, randomize, randomFactor, clamp, loop, mirror, easing, step, frameCount, callback });
+		Object.assign(this, { start, end, progress, duration, randomize, randomFactor, clamp, loop, mirror, easing, step, frameCount, callback });
 		
-		this.progress = 0;
 		this.dir = 1; // for mirroring
 		this.isDone = false;
 		this.setRandoms();
@@ -226,9 +226,9 @@ export class Animator {
 		if (this.isDone) return;
 
 		this.progress += timeElapsedInSeconds * this.dir;
-
+		// console.log(this.progress);
 		let value = map(this.getEasingValue(), 0, 1, this.start, this.end, this.clamp);
-		
+
 		if (this.progress >= this.duration && this.dir === 1) {
 			if (this.mirror) {
 				this.dir = -1;
@@ -262,7 +262,7 @@ export class Animator {
 				this.count = 0;
 			}
 		}
-
+		// console.log(value)
 		this.callback(value);
 	}
 
