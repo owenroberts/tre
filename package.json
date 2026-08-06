@@ -1,5 +1,7 @@
 {
-	"name": "tre",
+	"name": "@b/tre",
+	"type": "module",
+	"main": "src/tre.js",
 	"version": "0.0.1",
 	"description": "some three js stuff for owen ribbit projects",
 	"repository": {

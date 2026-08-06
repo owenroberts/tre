@@ -10,11 +10,30 @@ export class Bird {
 
 	/**
 	 * constructs bird
-	 * @param  {number} [options.size] size of bird
+	 * @param  {object} [params={}]
+	 * @param  {number} [params.size] - size of bird
 	 */
 	constructor(params={}) {
 		
 		const size = params.size ?? random(0.5, 2);
+
+		// fauna have flocking params for flock class inclusion
+		this.speed = 0.4;
+		this.flocking = {
+			radius: 10,
+			align: 1,
+			center: 1,
+			separation: 1,
+			seek: 2,
+			boundary: 1,
+		};
+
+		// this prob more dependent on the project ... maybe get params from flock
+		this.flockDistribution = {
+			x: [-5, 5],
+			y: [0, 5],
+			z: [-5, 5],
+		};
 		
 		this.model = new THREE.Object3D();
 		this.lines = { left: [], right: [], };
@@ -34,12 +53,14 @@ export class Bird {
 			joint.add(l2);
 			joint.setOrigins();
 			this.model.add(joint.obj);
+
+			let r = random(1);
 			
 			joint.animator = new Animator({
 				start: Math.PI * -0.125,
 				end: Math.PI * 0.125,
 				duration: 1,
-				progress: i * 0.33,
+				progress: (r + i * 0.33) % 1,
 				easing: Easings.SINE_OUT,
 				callback: value => {
 					joint.setRotation({ x: value });
@@ -49,7 +70,6 @@ export class Bird {
 			this.joints.push(joint);
 		}
 	}
-
 
 
 	/**
