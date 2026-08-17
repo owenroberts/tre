@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { setupPostProcessing, getSketchyParams } from './setup-post-processing';
 import { SceneBuilder } from './scene-builder';
-import { Bird, Flock, Follower } from '../tre';
+import { Bird, Flock, Follower, BIRD_FLOCK_CONFIG } from '../tre';
 
 export class BirdFlock {
 	constructor(sceneParams) {
@@ -35,25 +35,29 @@ export class BirdFlock {
 		const d = 20;
 		const d2 = d/2;
 
-		this.flockTargets = [
+		const targets = [
 			builder.addSphere({ x: d,  y: d2,  z: -d }), 
 			builder.addSphere({ x: -d, y:  d,  z: -d }), 
 			builder.addSphere({ x: -d, y:  d2, z: d  }), 
 		];
-		this.targetIndex = 0;
 
-		this.flock = new Flock({ type: Bird }, { size: 0.5 });
-		this.flock.members.forEach(m => this.scene.add(m.obj)); // automate this ...
-		this.flock.setup(this.flockTargets[0], this.flockTargets[1]);
+		this.flock = new Flock({
+			scene: this.scene,
+			count: 6, 
+			type: Bird, 
+			config: BIRD_FLOCK_CONFIG, 
+			memberParams: { size: 1 },
+			start: targets[0].position,
+			targets: targets.map(t => t.position),
+		});
+		// this.flock.setup(this.flockTargets[0], this.flockTargets[1]);
 
-		const b = this.flock.members[0].member;
 		const flockData = {
-			speed: b.speed,
-			radius: b.flocking.radius,
-			align: b.flocking.align,
-			center: b.flocking.center,
-			separation: b.flocking.separation,
-			seek: b.flocking.seek,
+			radius: BIRD_FLOCK_CONFIG.flocking.radius,
+			align: BIRD_FLOCK_CONFIG.flocking.align,
+			center: BIRD_FLOCK_CONFIG.flocking.center,
+			separation: BIRD_FLOCK_CONFIG.flocking.separation,
+			seek: BIRD_FLOCK_CONFIG.flocking.seek,
 		};
 
 	}
@@ -69,12 +73,6 @@ export class BirdFlock {
 
 
 		this.flock.update(timeElapsedInSeconds);
-		if (this.flock.reachedTarget) {
-			this.targetIndex = (this.targetIndex + 1) % this.flockTargets.length;
-			this.flock.target = this.flockTargets[this.targetIndex];
-			this.flock.reachedTarget = false;
-
-		}
 	}
 
 	setupParams(panel) {
@@ -83,7 +81,7 @@ export class BirdFlock {
 
 		panel.addRef({
 			label: "speed",
-			value: 0.4,
+			value: BIRD_FLOCK_CONFIG.speed,
 			callback: value => {
 				this.flock.members.forEach(m => { m.speed = value; });
 			}

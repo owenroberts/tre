@@ -14,28 +14,8 @@ export class Bird {
 	 * @param  {number} [params.size] - size of bird
 	 */
 	constructor(params={}) {
-		console.log(params);
 		const size = params.size ?? random(0.5, 2);
-		console.log({ size });
 
-		// fauna have flocking params for flock class inclusion
-		this.speed = 0.2;
-		this.flocking = {
-			radius: 10,
-			align: 1,
-			center: 1,
-			separation: 1,
-			seek: 2,
-			boundary: 1,
-		};
-
-		// this prob more dependent on the project ... maybe get params from flock
-		this.flockDistribution = {
-			x: [-5, 5],
-			y: [0, 5],
-			z: [-5, 5],
-		};
-		
 		this.model = new THREE.Object3D();
 		this.lines = { left: [], right: [], };
 		this.joints = [];

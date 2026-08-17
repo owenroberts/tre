@@ -4,53 +4,54 @@ import { Bird } from './bird';
 
 export class FlockMember {
 
-	constructor(params, memberParams) {
-
-		// this.type = params.type;
+	constructor(params) {
 
 		// need to redefine boundaries a bit -- longies flock based on spherical world setup
 		this.boundaries = params.boundaries; 
-
+		this.config = params.config;
 		this.obj = new THREE.Object3D(); // need better name for this like origin or pivot or something
 		this.id = this.obj.id;
+		params.scene.add(this.obj);
 
-		this.member = new params.type(memberParams); // flock.members.member, awkard
+		this.member = new params.type(params.memberParams);
 
 		this.obj.add(this.member.model);
-		this.speed = this.member.speed;
-		this.flocking = this.member.flocking;
-		this.flockDistribution = this.member.flockDistribution;
+		this.speed = this.config.speed;
+		this.flocking = this.config.flocking;
+		this.distribution = this.config.distribution;
 
-		this.reachedTarget = false;
+		this.targetIndex = 0;
+		this.targets = params.targets;
+		this.target = new THREE.Vector3().copy(params.targets[0])
+		this.threshold = 1.5;
+
 		this.velocity = new THREE.Vector3(0, 0, 0);
 		this.acceleration = new THREE.Vector3(0, 0, 0);
 		this.maxForce =  0.1 * this.speed; // same?
-	}
 
-	setup(start, target) {
-		this.obj.position.copy(start.position);
-		// this.obj.up.copy(start.normal);
-		this.obj.lookAt(target.position);
+		this._alignment = new THREE.Vector3(); // flock velocity
+		this._separation = new THREE.Vector3();
+		this._center = new THREE.Vector3();
+		this._diff = new THREE.Vector3();
+		this._lookTarget = new THREE.Vector3();
 
+		this.obj.position.copy(params.start ?? new THREE.Vector3(0, 0, 0));
 		this.obj.position.add(new THREE.Vector3(
-			random(this.flockDistribution.x[0], this.flockDistribution.x[1]),
-			random(this.flockDistribution.y[0], this.flockDistribution.y[1]),
-			random(this.flockDistribution.z[0], this.flockDistribution.z[1]),
+			random(this.distribution.x[0], this.distribution.x[1]),
+			random(this.distribution.y[0], this.distribution.y[1]),
+			random(this.distribution.z[0], this.distribution.z[1]),
 		));
 
-		// hmm, this is a bit different ... 
-		// if (type.name === 'Worm') {
-		// 	obj.translateX(Cool.random(-3, 3));
-		// 	obj.translateZ(Cool.random(-2, 2));
-		// 	model.get().up.copy(obj.up);
-		// 	model.setup(obj.position);
-		// }
+		this.obj.lookAt(this.target);
+		this.target.copy(this.target);
+
 	}
 
-	flock(others, target) {
-		const alignment = new THREE.Vector3(); // flock velocity
-		const separation = new THREE.Vector3();
-		const center = new THREE.Vector3();
+	flock(others) {
+		this._alignment.set(0, 0, 0);
+		this._separation.set(0, 0, 0);
+		this._center.set(0, 0, 0);
+		this._diff.set(0, 0, 0);
 		let count = 0;
 		
 		for (let i = 0; i < others.length; i++) {
@@ -60,43 +61,39 @@ export class FlockMember {
 			const distance = this.obj.position.distanceTo(other.obj.position);
 			if (distance < this.flocking.radius) {
 				count++;
-				center.add(other.obj.position);
-				alignment.add(other.velocity);
+				this._center.add(other.obj.position);
+				this._alignment.add(other.velocity);
 
-				separation.copy(this.obj.position).sub(other.obj.position);
-				separation.normalize();
-				separation.divideScalar(distance);
-				separation.multiplyScalar((this.flocking.radius - distance));
+				this._diff.subVectors(this.obj.position, other.obj.position);
+				this._diff.normalize();
+				this._diff.divideScalar(distance);
+				this._separation.add(this._diff);
 			}
 		}
 
 		if (count > 0) {
-			separation.normalize();
-			separation.sub(this.velocity);
-			separation.multiplyScalar(this.flocking.separation);
-			separation.multiplyScalar(this.speed);
-			separation.clampScalar(-this.maxForce, this.maxForce);
-			this.applyForce(separation);
+			this._separation.normalize();
+			this._separation.multiplyScalar(this.speed).sub(this.velocity);
+			this._separation.clampLength(0, this.maxForce);
+			this.applyForce(this._separation.multiplyScalar(this.flocking.separation));
 
-			alignment.divideScalar(count);
-			alignment.normalize();
-			alignment.sub(this.velocity);
-			alignment.multiplyScalar(this.flocking.align);
-			alignment.multiplyScalar(this.speed);
-			alignment.clampScalar(-this.maxForce, this.maxForce);
-			this.applyForce(alignment);
+			this._alignment.divideScalar(count);
+			this._alignment.normalize();
+			this._alignment.sub(this.velocity);
+			this._alignment.multiplyScalar(this.speed).sub(this.velocity);
+			this._alignment.clampLength(0, this.maxForce);
+			this.applyForce(this._alignment.multiplyScalar(this.flocking.align));
 
-			// test thiese
-			// center.divideScalar(count);
-			// this.seek(center);
+			this._center.divideScalar(count);
+			this.seek(this._center);
 		}
 	}
 
-	seek(target) {
-		const desired = target.position.clone().sub(this.obj.position);
-		desired.multiplyScalar(this.speed);
+	seek(targetPosition) {
+		const desired = targetPosition.clone().sub(this.obj.position);
+		desired.normalize().multiplyScalar(this.speed);
 		const steer = desired.sub(this.velocity);
-		steer.clampScalar(-this.maxForce, this.maxForce);
+		steer.clampLength(0, this.maxForce);
 		steer.multiplyScalar(this.flocking.seek);
 		this.applyForce(steer);
 	}
@@ -129,32 +126,33 @@ export class FlockMember {
 		this.acceleration.add(force);
 	}
 
-	update(timeElapsedInSeconds, others, target) {
+	update(timeElapsedInSeconds, others) {
 
 		this.member.update(timeElapsedInSeconds);
+
 		this.flock(others);
-		this.seek(target);
-		// // this.boundary();
+
+		if (this.target) {
+			this.seek(this.target);
+
+			const dist = this.obj.position.distanceTo(this.target);
+
+			if (dist < this.threshold) { 
+				this.targetIndex = (this.targetIndex + 1) % this.targets.length;
+				this.target.copy(this.targets[this.targetIndex]);
+			}
+		}
+		// this.boundary();
 		
 		this.velocity.add(this.acceleration);
 		this.velocity.clampScalar(-this.speed, this.speed);
 		this.obj.position.add(this.velocity);
 		this.acceleration.multiplyScalar(0);
-		this.obj.lookAt(this.obj.position.clone().add(this.velocity));
 
-		if (this.obj.position.distanceTo(target.position) < 1) { 
-			this.reachedTarget = true;
+		if (this.velocity.lengthSq() > 0.00001) {
+			this._lookTarget.copy(this.obj.position).add(this.velocity);
+			this.obj.lookAt(this._lookTarget);
 		}
+		
 	}
-
-	// seems weird to have this logic, needed?? should be flock right?
-	isTargetReached() {
-		if (this.reachedTarget) {
-			this.reachedTarget = false;
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 }
