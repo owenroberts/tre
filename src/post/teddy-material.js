@@ -1,8 +1,8 @@
 // https://tympanus.net/codrops/2022/11/29/sketchy-pencil-effect-with-three-js-post-processing/
 import * as THREE from 'three';
 
-import fragmentShader from './glsl/teddy_frag.glsl';
-import vertexShader from './glsl/teddy_vert.glsl';
+import fragmentShader from '../glsl/teddy_frag.glsl';
+import vertexShader from '../glsl/teddy_vert.glsl';
 
 // add some defaults here 
 export class TeddyMaterial extends THREE.ShaderMaterial {

@@ -1,0 +1,6 @@
+[submodule "b/oi"]
+	path = b/oi
+	url = https://github.com/owenroberts/oi
+[submodule "b/cool"]
+	path = b/cool
+	url = https://github.com/owenroberts/cool

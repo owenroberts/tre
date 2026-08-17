@@ -14,11 +14,12 @@ export class Bird {
 	 * @param  {number} [params.size] - size of bird
 	 */
 	constructor(params={}) {
-		
+		console.log(params);
 		const size = params.size ?? random(0.5, 2);
+		console.log({ size });
 
 		// fauna have flocking params for flock class inclusion
-		this.speed = 0.4;
+		this.speed = 0.2;
 		this.flocking = {
 			radius: 10,
 			align: 1,

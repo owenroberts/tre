@@ -16,5 +16,6 @@
 	},
 	"dependencies": {
 		"three": "^0.179.1"
-	}
+	},
+	"workspaces": ["b/*"]
 }

@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { random } from '../../../cool/cool.js';
-import { Bird } from './Bird.js';
+import { random } from '@b/cool'
+import { Bird } from './bird';
 
 export class FlockMember {
 
-	constructor(params) {
+	constructor(params, memberParams) {
 
 		// this.type = params.type;
 
@@ -14,7 +14,7 @@ export class FlockMember {
 		this.obj = new THREE.Object3D(); // need better name for this like origin or pivot or something
 		this.id = this.obj.id;
 
-		this.member = new params.type(); // flock.members.member, awkard
+		this.member = new params.type(memberParams); // flock.members.member, awkard
 
 		this.obj.add(this.member.model);
 		this.speed = this.member.speed;
@@ -25,7 +25,6 @@ export class FlockMember {
 		this.velocity = new THREE.Vector3(0, 0, 0);
 		this.acceleration = new THREE.Vector3(0, 0, 0);
 		this.maxForce =  0.1 * this.speed; // same?
-
 	}
 
 	setup(start, target) {

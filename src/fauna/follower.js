@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { random } from '../../../cool/cool.js';
+import { random } from '@b/cool';
 import { getAxesHelper } from '../helpers.js';
 
 export class Follower {

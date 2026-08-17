@@ -1,4 +1,4 @@
-import { map, random } from '../../cool/cool.js';
+import { map, random, assert } from '@b/cool';
 
 /**
  * easing types, from https://easings.net/
@@ -86,6 +86,8 @@ export class Animator {
 	 * @return {number} - 0-1 % progress
 	 */
 	getEasingValue() {
+		assert(typeof this.easing === "number", "easing value must be number");
+
 		let x = this.progress / this.duration; // 0 - 1 progress of animation
 
 		if (this.easing === Easings.LINEAR) return x;
@@ -226,7 +228,6 @@ export class Animator {
 		if (this.isDone) return;
 
 		this.progress += timeElapsedInSeconds * this.dir;
-		// console.log(this.progress);
 		let value = map(this.getEasingValue(), 0, 1, this.start, this.end, this.clamp);
 
 		if (this.progress >= this.duration && this.dir === 1) {

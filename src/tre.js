@@ -1,14 +1,13 @@
-
-import { Animator, Easings } from './Animator.js';
-import { Joint } from './Joint.js';
-import { BandShader } from './BandShader.js';
-import { LinesPass } from './LinesPass.js';
+import { Animator, Easings } from './animator';
+import { Joint } from './joint';
+import { BandShader } from './post/band-shader';
+import { LinesPass } from './post/lines-pass';
 import vertexShader from './glsl/simple_vert.glsl';
 import blendShader from './glsl/blend.glsl';
-import { getArrowHelper, getTestCube, getAxesHelper } from './Helpers.js';
-import { Bird } from './fauna/Bird.js';
-import { Flock } from './fauna/Flock.js';
-import { FlockMember } from './fauna/FlockMember.js';
-import { Follower } from './fauna/Follower.js';
+import { getArrowHelper, getTestCube, getAxesHelper } from './helpers.js';
+import { Bird } from './fauna/bird';
+import { Flock } from './fauna/flock';
+import { FlockMember } from './fauna/flock-member';
+import { Follower } from './fauna/follower.js';
 
 export { Animator, Easings, Joint, BandShader, LinesPass, vertexShader, blendShader, getArrowHelper, getTestCube, getAxesHelper, Bird, Flock, FlockMember, Follower };

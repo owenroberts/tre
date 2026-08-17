@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { random } from '../../../cool/cool.js';
-import { FlockMember } from './FlockMember.js';
+import { random } from '@b/cool';
+import { FlockMember } from './flock-member';
 
 export class Flock {
 
-	constructor(params) {
+	constructor(params, memberParams) {
 
 		this.reachedTarget = false;
 		this.members = [];
@@ -17,7 +17,7 @@ export class Flock {
 			this.members.push(new FlockMember({ 
 				type: params.type, 
 				boundaries: this.boundaries, 
-			}));
+			}, memberParams));
 		}
 	}
 
