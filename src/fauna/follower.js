@@ -1,77 +1,77 @@
 import * as THREE from 'three';
 import { random } from '@b/cool';
-import { getAxesHelper } from '../helpers.js';
+import { getAxesHelper } from '../helpers';
 
 export class Follower {
 
-	constructor(rider) {
+	constructor({ scene, targets, children=[], isCyclic=true, }) {
 
-		this.target = new THREE.Object3D();
-		this.rider = rider; // rider is the animation/flock/obj moving w follower
+		this.isActive = true;
+		this.isCyclic = isCyclic;
+
+		this.obj = new THREE.Object3D();
+		scene.add(this.obj);
+
+		this.updaters = [];
+
+		this.obj.add(getAxesHelper());
+
+		for (let i = 0; i < children.length; i++) {
+			this.addChild(children[i]);
+		}
+		
+		this.targets = targets;
+		this.targetIndex = 0;
+		this.target = new THREE.Vector3();
+		this.target.copy(targets[0]);
 
 		this.nextCount = 0;
-		this.speed = 0.004;
-		this.nextPosition = new THREE.Vector3();
-		// this.nextNormal = new THREE.Vector3();
+		this.speed = 4;
 		this.prevDistance = 1_000_000; // start off bigger than ever will be
 		this.reachedTarget = false;
 
+		// this.obj.position.copy(this.target);
+		this.obj.lookAt(this.target);
+
 	}
 
-	setup(start, next) {
-		this.target.position.set(start.position.x, start.position.y, start.position.z);
-		// this.target.up.copy(start.normal);
-		// this.target.lookAt(next.position);
-		this.nextPosition.copy(next.position);
-		// this.nextNormal.copy(next.normal);
-		
-		target.add(getAxesHelper()); // debug
+	addChild(obj) {
+		this.obj.add(obj); // lol
+		if (obj.update) {
+			this.updaters.push(obj);
+		}
 	}
 
-	setTarget(next) {
-		this.nextCount++;
-		this.reachedNext = false;
-		this.prevDistance = 1_000_000;
-		
-		// this.target.up.copy(this.nextNormal);
-		this.nextPosition.copy(next.position) ;
-		// this.nextNormal.copy(next.normal); // why does follower need normal?
-		
-		this.target.lookAt(this.nextPosition);
+	setTarget(target) {
+		this.target.copy(target);
+		this.obj.lookAt(target);
+	}
+
+	addTarget(target) {
+		this.targets.push(target);
 	}
 
 	update(timeElapsedInSeconds) {
-
+		if (!this.isActive) return;
 		if (isNaN(timeElapsedInSeconds)) return; // init error?
 
-		this.rider.update(timeElapsedInSeconds, this.target);
-
-		// actually maybe forget the whole reached target tracking in flock guys ... 
-		if (this.rider.reachedTarget) {
-			this.reachedTarget = true;
+		for (let i = 0; i < this.updaters.length; i++) {
+			this.updaters[i].update(timeElapsedInSeconds, this.target);
 		}
 
-		// handle in rider, not here
-		// if (flock) {
-		// 	flock.update(timeElapsed, target);
-		// 	if (flock.reachedTarget()) {
-		// 		reachedNext = true;
-		// 	}
-		// } else {
-		// 	if (isWalking) {
-		// 		const walkDistance = target.position.distanceTo(nextPosition);
-		// 		if (walkDistance > 0.1 && (prevDistance - walkDistance) > 0) {
-		// 			target.translateZ(speed * timeElapsed);
-		// 			prevDistance = walkDistance;
-		// 		} else {
-		// 			reachedNext = true;
-		// 		}
-		// 	}
-
-		// 	if (animation) {
-		// 		animation.update(timeElapsed, isWalking);
-		// 	}
-		// }
+		const dist = this.obj.position.distanceTo(this.target);
+		// if (dist > 0.1 && (this.prevDistance - dist) > 0) {
+		if (dist > 0.1) {
+			this.obj.translateZ(this.speed * timeElapsedInSeconds);
+			// this.prevDistance = dist;
+		} else {
+			if (this.isCyclic) {
+				this.targetIndex = (this.targetIndex + 1) % this.targets.length;
+				this.target.copy(this.targets[this.targetIndex]);
+				this.obj.lookAt(this.target);
+			} else {
+				this.isActive = false;
+			}
+		}
 	}
-
 }

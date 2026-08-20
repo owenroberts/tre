@@ -14,6 +14,8 @@ export class LinesMaterial extends THREE.ShaderMaterial {
 				bgAlpha: params.uniforms.bgAlpha,
 				diffuseCutoff: params.uniforms.diffuseCutoff,
  				normalCutoff: params.uniforms.normalCutoff,
+				diffuseOffsetModifier: params.uniforms.diffuseOffsetModifier,
+				normalOffsetModifier: params.uniforms.normalOffsetModifier,
  				noiseMultiplier: params.uniforms.noiseMultiplier,
 				tDiffuse: { value: null },
 				uNormals: { value: null },

@@ -71,7 +71,8 @@ export class LinesPass extends Pass {
 			renderer.setRenderTarget(null);
 			this.fsQuad.render(renderer);
 		} else {
-			throw Error("You don't think this ever happens but now it did!");
+			// throw Error("you don't think this ever happens but now it did!");
+			// needed for compositing multiple scenes
 			renderer.setRenderTarget(writeBuffer);
 			if (this.clear) renderer.clear();
 			this.fsQuad.render(renderer);

@@ -10,6 +10,9 @@ uniform float diffuseCutoff;
 uniform float normalCutoff;
 uniform float noiseMultiplier;
 
+uniform float diffuseOffsetModifier;
+uniform float normalOffsetModifier;
+
 
 // https://www.shadertoy.com/view/XdXGW8
 vec2 grad( ivec2 z ) 
@@ -52,7 +55,7 @@ float valueAtPoint(sampler2D image, vec2 coord, vec2 texel, vec2 point) {
 
 float diffuseValue(int x, int y) {
 	float cutoff = diffuseCutoff;
-	float offset = 0.5 / cutoff;
+	float offset = diffuseOffsetModifier / cutoff;
 	float noiseValue = clamp(texture(uTexture, vUv).r, 0.0, cutoff) / cutoff - offset;
 
 	return valueAtPoint(tDiffuse, vUv + noiseValue, vec2(1.0 / uResolution.x, 1.0 / uResolution.y), vec2(x, y)) * 0.6;
@@ -60,7 +63,7 @@ float diffuseValue(int x, int y) {
 
 float normalValue(int x, int y) {
 	float cutoff = normalCutoff;
-	float offset = 0.5 / cutoff;
+	float offset = normalOffsetModifier / cutoff;
 	float noiseValue = clamp(texture(uTexture, vUv).r, 0.0, cutoff) / cutoff - offset;
 
 	// 0.3 also change noise amount or coverage

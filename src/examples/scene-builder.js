@@ -9,8 +9,8 @@ export class SceneBuilder {
 		this.scene = scene;
 	}
 
-	addCube({ w=1, h=1, d=1, x=0, y=0, z=0, castShadow=true }={}) {
-		const geometry = new THREE.BoxGeometry( w, h, d );
+	addCube({ size=1, w=1, h=1, d=1, x=0, y=0, z=0, castShadow=true }={}) {
+		const geometry = new THREE.BoxGeometry( size ?? w, size ?? h, size ?? d );
 		const material = new THREE.MeshStandardMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		cube.position.set(x, y, z);

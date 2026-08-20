@@ -14,11 +14,9 @@ const linesPassDefaults = {
 	bgAlpha: 0.0,
 	diffuseCutoff: 40,
 	normalCutoff: 50,
+	diffuseOffsetModifier: 0.5, // 0.5 is loggy, 0 is more linear
+	normalOffsetModifier: 0.5,
 	noiseMultiplier: 10,
-
-	// unused params?
-	diffuseNoiseOffset: 0.0, 
-	normalNoiseOffset: 0.0,
 };
 
 /**
@@ -36,6 +34,7 @@ export function setupPostProcessing({ scene, camera, renderer }) {
 	renderer.toneMappingExposure = 1.75;
 	renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+	renderer.setPixelRatio(window.devicePixelRatio);
 	
 	const linesPass = new LinesPass({
 		scene, 
@@ -49,6 +48,8 @@ export function setupPostProcessing({ scene, camera, renderer }) {
 			diffuseCutoff: { type: 'float', value: linesPassDefaults.diffuseCutoff },
 			normalCutoff: { type: 'float', value: linesPassDefaults.normalCutoff },
 			noiseMultiplier: { type: 'float', value: linesPassDefaults.noiseMultiplier },
+			diffuseOffsetModifier: { type: 'float', value: linesPassDefaults.diffuseOffsetModifier },
+			normalOffsetModifier: { type: 'float', value: linesPassDefaults.normalOffsetModifier },
 		}
 	});
 
@@ -57,7 +58,7 @@ export function setupPostProcessing({ scene, camera, renderer }) {
 	composer.addPass(renderPass);
 	composer.addPass(linesPass);
 
-	return { composer, linesPass };
+	return { composer, linesPass, renderPass };
 }
 
 export function getSketchyParams(ui, uniforms) {
@@ -101,6 +102,16 @@ export function getSketchyParams(ui, uniforms) {
 		step: 0.1,
 	});
 
+console.log(uniforms);
+	ui.addRef({
+		label: "diffuse offset modifier",
+		obj: uniforms.diffuseOffsetModifier,
+		ref: "value",
+		// min: 0.1,
+		// max: 1.0,
+		step: 0.01
+	});
+
 	ui.addRef({
 		label: "normal cutoff",
 		obj: uniforms.normalCutoff,
@@ -108,6 +119,15 @@ export function getSketchyParams(ui, uniforms) {
 		min: 0.1,
 		max: 100.0,
 		step: 0.1,
+	});
+
+	ui.addRef({
+		label: "normal offset modifier",
+		obj: uniforms.normalOffsetModifier,
+		ref: "value",
+		// min: 0.1,
+		// max: 1.0,
+		step: 0.01
 	});
 
 	ui.addRef({

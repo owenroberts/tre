@@ -86,8 +86,16 @@ export class BirdFlock {
 				this.flock.members.forEach(m => { m.speed = value; });
 			}
 		});
+
+		for (const k in BIRD_FLOCK_CONFIG.flocking) {
+			panel.addRef({
+				label: k,
+				value: BIRD_FLOCK_CONFIG.flocking[k],
+				callback: value => {
+					this.flock.members.forEach(m => { m.flocking[k] = value; });
+				}
+			});
+		}
 	}
-
-
 }
 

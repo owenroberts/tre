@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { random } from "../../../cool/cool.js";
-import { Joint, Animator, Easings } from "../tre.js";
-import { addLine } from "../geometries.js";
+import { random } from '@b/cool';
+import { Joint, Animator, Easings, addLine } from '../tre';
 
 /**
  * little animated triangle bird

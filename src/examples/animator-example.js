@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { SceneBuilder } from './scene-builder';
 import { getAnimatorParams } from './get-animator-params';
-import { Easings, Animator } from '../tre';
+import { Animator } from '../tre';
 
 export class AnimatorExample {
 	constructor(sceneParams) {
@@ -39,7 +39,6 @@ export class AnimatorExample {
 			end: 2,
 			duration: 3,
 			loop: false,
-			easing: Easings.LINEAR,
 			callback: value => {
 				sphere.position.y = value;
 			}

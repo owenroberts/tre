@@ -1,22 +1,25 @@
 import { UIPanel } from '@b/oi';
 import { alphabet } from '@b/cool';
 
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls';
-
-import { Default } from './examples/default';
-import { PostSketchy } from './examples/post-sketchy';
-import { PostTeddy } from './examples/post-teddy';
-import { PostBandSky } from './examples/post-band-sky';
-import { AnimatorExample } from './examples/animator-example';
-import { JointExample } from './examples/joint-example';
-import { JointAnimatorExample } from './examples/joint-animator-example';
-import { BirdExample } from './examples/bird-example';
-import { BirdFlock } from './examples/bird-flock';
+import { Default } from '../examples/default';
+import { PostSketchy } from '../examples/post-sketchy';
+import { DoublePostSketchy } from '../examples/double-post-sketchy';
+import { SketchyAnimator } from '../examples/sketchy-animator';
+import { PostTeddy } from '../examples/post-teddy';
+import { PostBandSky } from '../examples/post-band-sky';
+import { AnimatorExample } from '../examples/animator-example';
+import { JointExample } from '../examples/joint-example';
+import { JointAnimatorExample } from '../examples/joint-animator-example';
+import { BirdExample } from '../examples/bird-example';
+import { BirdFlock } from '../examples/bird-flock';
+import { GlobeExample } from '../examples/globe-example';
+import { FollowerExample } from '../examples/follower-example';
 
 const exampleList = [
 	Default,
 	PostSketchy,
+	DoublePostSketchy,
+	SketchyAnimator,
 	PostTeddy,
 	PostBandSky,
 	AnimatorExample,
@@ -24,23 +27,25 @@ const exampleList = [
 	JointAnimatorExample,
 	BirdExample,
 	BirdFlock,
+	GlobeExample,
+	FollowerExample,
 ];
 
 export class ExamplesPanel extends UIPanel {
-	constructor(ui) {
+	constructor(ui, threeObjs) {
 		super({ id: "examples", ui });
 
 		this.isSceneLoaded = false;
+		this.renderer = threeObjs.renderer;
+		this.scene = threeObjs.scene;
 
-		this.scene = new THREE.Scene();
-		this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-		this.camera.position.z = 5;
+		this.addRef({
+			label: "camera controls",
+			ref: "enabled",
+			obj: threeObjs.controls,
+		});
 
-		this.renderer = new THREE.WebGLRenderer();
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		document.body.appendChild(this.renderer.domElement);
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-
+		this.addBreak();
 
 		for (let i = 0; i < exampleList.length; i++) {
 			const ex = exampleList[i];
@@ -48,21 +53,20 @@ export class ExamplesPanel extends UIPanel {
 				text: `${alphabet[i]} ~ ${ex.name}`,
 				key: alphabet[i],
 				callback: () => {
-					this.load(ex);
+					this.load(ex, threeObjs);
 				}
 			});
-			// this.addBreak();
 		}
 	}
 
-	load(ex) {
+	load(ex, threeObjs) {
 		if (this.isSceneLoaded) {
 			this.renderer.setAnimationLoop(null);
 			this.dispose(this.scene);
 			this.renderer.clear();
 			this.ui.panels.params.clear();
 		}
-		const exampleScene = new ex(this);
+		const exampleScene = new ex(threeObjs);
 		this.renderer.setAnimationLoop(time => {
 			exampleScene.animate(time);
 		});
