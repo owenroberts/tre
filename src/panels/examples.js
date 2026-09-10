@@ -1,7 +1,6 @@
 import { UIPanel } from '@b/oi';
 import { alphabet } from '@b/cool';
 
-import { Default } from '../examples/default';
 import { PostSketchy } from '../examples/post-sketchy';
 import { DoublePostSketchy } from '../examples/double-post-sketchy';
 import { SketchyAnimator } from '../examples/sketchy-animator';
@@ -11,7 +10,7 @@ import { AnimatorExample } from '../examples/animator-example';
 import { JointExample } from '../examples/joint-example';
 import { JointAnimatorExample } from '../examples/joint-animator-example';
 import { BirdExample } from '../examples/bird-example';
-import { BirdFlock } from '../examples/bird-flock';
+import { BirdFlock } from '../examples/bird-flock-example';
 import { GlobeExample } from '../examples/globe-example';
 import { FollowerExample } from '../examples/follower-example';
 import { GeoCatExample } from '../examples/geo-cat-example';
@@ -19,9 +18,11 @@ import { ModelCatExample } from '../examples/model-cat-example';
 import { GeoPigExample } from '../examples/geo-pig-example';
 import { BreadcrumbsExample } from '../examples/breadcrumbs-example';
 import { SceneryExample } from '../examples/scenery-example';
+import { ParticlesExample } from '../examples/particles-example';
+import { WormExample } from '../examples/worm-example';
+import { WormFlockExample } from '../examples/worm-flock-example';
 
 const exampleList = [
-	Default,
 	PostSketchy,
 	DoublePostSketchy,
 	SketchyAnimator,
@@ -38,7 +39,10 @@ const exampleList = [
 	ModelCatExample,
 	GeoPigExample,
 	BreadcrumbsExample,
-	SceneryExample
+	SceneryExample,
+	ParticlesExample,
+	WormExample,
+	WormFlockExample,
 ];
 
 export class ExamplesPanel extends UIPanel {

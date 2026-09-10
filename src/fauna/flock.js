@@ -19,6 +19,23 @@ export const BIRD_FLOCK_CONFIG = {
 	},
 };
 
+export const WORM_FLOCK_CONFIG = {
+	speed: 0.08,
+	flocking: {
+		radius: 6,
+		align: 0.5,
+		center: 0.1,
+		separation: 2,
+		seek: 2,
+		boundary: 1,
+	},
+	distribution: {
+		x: [-3, 3],
+		y: [0, 0],
+		z: [-3, 3],
+	},
+};
+
 export class Flock {
 
 	constructor(params) {

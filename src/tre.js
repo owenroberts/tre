@@ -8,12 +8,13 @@ import blendShader from './glsl/blend.glsl';
 import { addLine, addTubeLine, mat, addRandomLine } from './utils';
 
 import { Bird } from './fauna/bird';
-import { Flock, BIRD_FLOCK_CONFIG } from './fauna/flock';
+import { Flock, BIRD_FLOCK_CONFIG, WORM_FLOCK_CONFIG } from './fauna/flock';
 import { FlockMember } from './fauna/flock-member';
 import { Follower } from './fauna/follower';
 
 import { GeoCat } from './fauna/geo-cat';
 import { GeoPig } from './fauna/geo-pig';
 import { ModelCat } from './fauna/model-cat';
+import { Worm } from './fauna/worm';
 
-export { Animator, Easings, Joint, BandShader, LinesPass, vertexShader, blendShader, Bird, Flock, FlockMember, Follower, BIRD_FLOCK_CONFIG, addLine, GeoCat, ModelCat, GeoPig, addTubeLine, addRandomLine };
+export { Animator, Easings, Joint, BandShader, LinesPass, vertexShader, blendShader, Bird, Flock, FlockMember, Follower, BIRD_FLOCK_CONFIG, WORM_FLOCK_CONFIG, addLine, GeoCat, ModelCat, GeoPig, addTubeLine, addRandomLine, Worm };

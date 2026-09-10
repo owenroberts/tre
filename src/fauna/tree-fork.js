@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import { random } from '@b/cool';
+import { random, balancedRandom } from '@b/cool';
 import { X_AXIS, Z_AXIS, addRandomLine } from '../utils';
 
 export function addForkTree({ scene, position, normal, length, radius, randomize, forkOnly=false }) {
 	
-	length = length - randomize * length + random(randomize) * length * 2;
+	length = balancedRandom(length, randomize);
 
 	const o = new THREE.Object3D();
 	o.position.copy(position);

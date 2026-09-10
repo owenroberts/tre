@@ -76,8 +76,4 @@ export class SceneryExample extends SketchExample {
 	}
 
 	render() {}
-
-	setupParams(panel) {
-		super.setupParams(panel);
-	}
 }

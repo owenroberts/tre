@@ -43,7 +43,10 @@ export class SceneBuilder {
 	addGround({ w=10, h=10, y=-1, receiveShadow=true }={}) {
 		const plane = new THREE.Mesh(
 			new THREE.PlaneGeometry(w, h),
-			new THREE.MeshStandardMaterial({ color: 0xffffff })
+			new THREE.MeshStandardMaterial({ 
+				color: 0xffffff,
+				side: THREE.DoubleSide,
+			}),
 		);
 		plane.rotation.x = -Math.PI / 2;
 		plane.position.y = y;
@@ -59,6 +62,13 @@ export class SceneBuilder {
 		directionalLight.shadow.mapSize.width = 2048;
 		directionalLight.shadow.mapSize.height = 2048;
 		this.scene.add(directionalLight);
+
+		const dLight2 = new THREE.DirectionalLight(0xffffff, 0.25);
+		dLight2.position.set(2, 2, -2);
+		// dLight2.castShadow = true;
+		// dLight2.shadow.mapSize.width = 2048;
+		// dLight2.shadow.mapSize.height = 2048;
+		this.scene.add(dLight2);
 
 		const hemisphereLight = new THREE.HemisphereLight(0x7a3114, 0x48c3ff, 0.5);
 		this.scene.add(hemisphereLight);

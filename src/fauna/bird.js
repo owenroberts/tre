@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { random } from '@b/cool';
+import { random, balancedRandom } from '@b/cool';
 import { Joint, Animator, Easings, addTubeLine } from '../tre';
 
 /**
@@ -9,13 +9,17 @@ export class Bird {
 
 	/**
 	 * constructs bird
-	 * @param  {object} [params={}]
+	 * @params {object} params
 	 * @param  {number} [params.size] - size of bird
+	 * @param  {number} [params.randomize] - balanced random size
 	 */
-	constructor(params={}) {
-		const size = params.size ?? random(0.5, 2);
+	constructor({ scene, size=1, randomize=0 }) {
+		
+		size = balancedRandom(size, randomize);
 
 		this.model = new THREE.Object3D();
+		scene.add(this.model);
+		
 		this.lines = { left: [], right: [], };
 		this.joints = [];
 	

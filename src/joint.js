@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { assert, random } from '../../cool/cool.js';
-import { getAxesHelper } from '../src/helpers.js';
+import { assert, random } from '@b/cool';
+import { getAxesHelper } from './helpers';
 
 /**
  * joint class

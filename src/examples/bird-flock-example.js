@@ -1,15 +1,12 @@
 import * as THREE from 'three';
-
-import { setupPostProcessing, getSketchyParams } from './setup-post-processing';
+import { SketchExample } from './sketch-example';
 import { SceneBuilder } from './scene-builder';
-import { Bird, Flock, Follower, BIRD_FLOCK_CONFIG } from '../tre';
+import { Bird, Flock, BIRD_FLOCK_CONFIG } from '../tre';
 
-export class BirdFlock {
+export class BirdFlock extends SketchExample {
+
 	constructor(sceneParams) {
-
-		this.scene = sceneParams.scene;
-		this.camera = sceneParams.camera;
-		this.renderer = sceneParams.renderer;
+		super(sceneParams);
 
 		this.camera.position.x = 30;
 		this.camera.position.z = 30;
@@ -17,20 +14,9 @@ export class BirdFlock {
 
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-		this.debug = false;
-		this.sketchy = true;
-
 		const builder = new SceneBuilder(this.scene);
 		builder.addGround();
 		builder.addLights();
-
-		const post = setupPostProcessing({
-			scene: this.scene, 
-			camera: this.camera,
-			renderer: this.renderer,
-		});
-
-		this.composer = post.composer;
 
 		const d = 20;
 		const d2 = d/2;
@@ -62,22 +48,12 @@ export class BirdFlock {
 
 	}
 
-	animate(time) {
-		if (!this.prevTime) this.prevTime = time;
-		const timeElapsed = time - this.prevTime;
-		this.prevTime = time;
-		const timeElapsedInSeconds = timeElapsed / 1000;
-
-		if (this.sketchy) this.composer.render();
-		else this.renderer.render(this.scene, this.camera);
-
-
+	render(timeElapsedInSeconds) {
 		this.flock.update(timeElapsedInSeconds);
 	}
 
 	setupParams(panel) {
-		panel.addRef({ obj: this, ref: "debug", });
-		panel.addRef({ obj: this, ref: "sketchy", });
+		super.setupParams(panel);
 
 		panel.addRef({
 			label: "speed",

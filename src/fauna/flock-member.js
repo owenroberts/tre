@@ -13,7 +13,7 @@ export class FlockMember {
 		this.id = this.obj.id;
 		params.scene.add(this.obj);
 
-		this.member = new params.type(params.memberParams);
+		this.member = new params.type({ scene: params.scene, ...params.memberParams });
 
 		this.obj.add(this.member.model);
 		this.speed = this.config.speed;
