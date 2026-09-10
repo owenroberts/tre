@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { random } from '@b/cool';
-import { Joint, Animator, Easings, addLine } from '../tre';
+import { Joint, Animator, Easings, addTubeLine } from '../tre';
 
 /**
  * little animated triangle bird
@@ -27,8 +27,8 @@ export class Bird {
 			const joint = new Joint();
 			joint.addPosition(0, 0, size * 1/3 * i);
 
-			const l1 = addLine(p1, p2);
-			const l2 = addLine(p1, p3); 
+			const l1 = addTubeLine(p1, p2);
+			const l2 = addTubeLine(p1, p3); 
 			joint.add(l1);
 			joint.add(l2);
 			joint.setOrigins();

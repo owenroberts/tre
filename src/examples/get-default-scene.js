@@ -18,7 +18,7 @@ export function getDefaultScene(scene) {
 		const sphere = new THREE.Mesh( geometry, material ); 
 		sphere.castShadow = true;
 		sphere.position.set(2, 0, 0);
-		scene.add( sphere );
+		scene.add(sphere);
 	}
 	addSphere();
 

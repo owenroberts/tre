@@ -4,8 +4,6 @@
 
 import * as THREE from 'three';
 
-// debug
-
 export function getTestCube(x, y, z, size=0.5) {
 	var box = new THREE.Mesh(
 		new THREE.BoxGeometry(size, size, size), 
@@ -26,21 +24,3 @@ export function getAxesHelper(position, normal, size=2) {
 	return a;
 }
 
-// default material
-export const mat = new THREE.MeshStandardMaterial({ 
-	color: 0x3d3d3d,
-	side: THREE.DoubleSide,
-	// wireframe: true,
-});
-
-/**
- * common geometries used for flora and fauna construction
- */
-
-export function addLine(pos, pos2, radius=.08) {
-	const line = new THREE.LineCurve3(pos, pos2);
-	const tube = new THREE.TubeGeometry(line, 1, radius, 3);
-	const mesh = new THREE.Mesh(tube, mat);
-	mesh.castShadow = true;
-	return mesh;
-}

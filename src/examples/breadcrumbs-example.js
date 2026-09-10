@@ -1,8 +1,8 @@
 import * as THREE from 'three';
+import { SketchExample } from './sketch-example';
 import { SceneBuilder } from './scene-builder';
 import { Follower } from '../tre';
-import { SketchExample } from './sketch-example';
-
+import { Breadcrumbs } from '../fauna/breadcrumbs';
 
 /**
  * creates a follower
@@ -10,7 +10,7 @@ import { SketchExample } from './sketch-example';
  * attach a child visual (obj or animation)
  * basically flock for single obj ... 
  */
-export class FollowerExample extends SketchExample {
+export class BreadcrumbsExample extends SketchExample {
 	constructor(sceneParams) {
 		super(sceneParams);
 
@@ -19,15 +19,13 @@ export class FollowerExample extends SketchExample {
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 		const builder = new SceneBuilder(this.scene);
-		builder.addGround();
+		// builder.addGround();
 		builder.addLights();
 
 		const targets = [
-			builder.addSphere({ x: 5, y: 5, z: 20 }),
-			builder.addSphere({ x: 10, y: 5, z: 10 }),
-			builder.addSphere({ x: 5, y: 5, z: 0 }),
-			builder.addSphere({ x: 10, y: 5, z: -10 }),
-			builder.addSphere({ x: 5, y: 5, z: -20 }),
+			builder.addSphere({ x: 5, y: 0, z: 20 }),
+			builder.addSphere({ x: -20, y: 0, z: 0 }),
+			builder.addSphere({ x: 5, y: 0, z: -20 }),
 		];
 
 		const followerObj = builder.addCube({ x: 0, y: 0, z: 0 });
@@ -38,9 +36,23 @@ export class FollowerExample extends SketchExample {
 			isCyclic: true,
 		});
 
+		this.breadcrumbs = new Breadcrumbs({ 
+			scene: this.scene,
+			target: this.follower.obj,
+		});
+
+		this.isActive = true;
+
 	}
 
 	render(timeElapsedInSeconds) {
 		this.follower.update(timeElapsedInSeconds);
+		this.breadcrumbs.update(timeElapsedInSeconds, this.isActive);
+	}
+
+	setupParams(panel) {
+		super.setupParams(panel);
+		panel.addRef({ obj: this, ref: "isActive", });
+		panel.addRef({ obj: this.breadcrumbs.animator, ref: "frameCount" });
 	}
 }

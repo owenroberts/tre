@@ -1,11 +1,11 @@
-import { map, random, assert } from '@b/cool';
+import { map, random, assert, Enum } from '@b/cool';
 
 /**
  * easing types, from https://easings.net/
  * https://github.com/ai/easings.net/blob/master/src/easings/easingsFunctions.ts
  * @enum {number}
  */
-export const Easings = {
+export const Easings = Enum({
 	LINEAR: 0,
 	SINE_IN: 1,
 	SINE_OUT: 2,
@@ -22,15 +22,15 @@ export const Easings = {
 	BOUNCE_IN: 13,
 	BOUNCE_OUT: 14,
 	BOUNCE_IN_OUT: 15,
-};
+});
 
-const EaseConsts = {
+const EaseConsts = Enum({
 	C1: 1.70158,
 	C2: 1.70158 * 1.525,
 	C3: 1.70158 + 1,
 	C4: (2 * Math.PI) / 3,
 	C5: (2 * Math.PI) / 4.5,
-};
+});
 
 /**
  * animator class
@@ -79,6 +79,7 @@ export class Animator {
 		};
 
 		this.count = 0;
+
 	}
 
 	/**

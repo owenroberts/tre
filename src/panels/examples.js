@@ -14,6 +14,11 @@ import { BirdExample } from '../examples/bird-example';
 import { BirdFlock } from '../examples/bird-flock';
 import { GlobeExample } from '../examples/globe-example';
 import { FollowerExample } from '../examples/follower-example';
+import { GeoCatExample } from '../examples/geo-cat-example';
+import { ModelCatExample } from '../examples/model-cat-example';
+import { GeoPigExample } from '../examples/geo-pig-example';
+import { BreadcrumbsExample } from '../examples/breadcrumbs-example';
+import { SceneryExample } from '../examples/scenery-example';
 
 const exampleList = [
 	Default,
@@ -29,6 +34,11 @@ const exampleList = [
 	BirdFlock,
 	GlobeExample,
 	FollowerExample,
+	GeoCatExample,
+	ModelCatExample,
+	GeoPigExample,
+	BreadcrumbsExample,
+	SceneryExample
 ];
 
 export class ExamplesPanel extends UIPanel {

@@ -4,11 +4,16 @@ import { BandShader } from './post/band-shader';
 import { LinesPass } from './post/lines-pass';
 import vertexShader from './glsl/simple_vert.glsl';
 import blendShader from './glsl/blend.glsl';
-import { getArrowHelper, getTestCube, getAxesHelper, addLine } from './helpers.js';
+
+import { addLine, addTubeLine, mat, addRandomLine } from './utils';
 
 import { Bird } from './fauna/bird';
 import { Flock, BIRD_FLOCK_CONFIG } from './fauna/flock';
 import { FlockMember } from './fauna/flock-member';
-import { Follower } from './fauna/follower.js';
+import { Follower } from './fauna/follower';
 
-export { Animator, Easings, Joint, BandShader, LinesPass, vertexShader, blendShader, getArrowHelper, getTestCube, getAxesHelper, Bird, Flock, FlockMember, Follower, BIRD_FLOCK_CONFIG, addLine };
+import { GeoCat } from './fauna/geo-cat';
+import { GeoPig } from './fauna/geo-pig';
+import { ModelCat } from './fauna/model-cat';
+
+export { Animator, Easings, Joint, BandShader, LinesPass, vertexShader, blendShader, Bird, Flock, FlockMember, Follower, BIRD_FLOCK_CONFIG, addLine, GeoCat, ModelCat, GeoPig, addTubeLine, addRandomLine };

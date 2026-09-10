@@ -24,6 +24,7 @@ export class LinesPass extends Pass {
 		const normalBuffer = new THREE.WebGLRenderTarget(width, height);
 		normalBuffer.texture.format = THREE.RGBAFormat;
 		normalBuffer.texture.type = THREE.HalfFloatType;
+
 		// normalBuffer.texture.type = THREE.UnsignedShort4444Type;
 		// this breaks the particles but idk what it does ... 
 		// also adds weird grid, but there are other types
@@ -55,12 +56,18 @@ export class LinesPass extends Pass {
 	render(renderer, writeBuffer, readBuffer) {
 		
 		// this.material.uniforms['tDiffuse'].value = readBuffer.texture;
+		
+		this.camera.layers.set(0); // don't render lines in normal buffer
 		renderer.setRenderTarget(this.normalBuffer);
 		
 		const overrideMaterialValue = this.scene.overrideMaterial;
 		
 		this.scene.overrideMaterial = this.normalMaterial;
 		renderer.render(this.scene, this.camera);
+
+		// bring lines back
+		this.camera.layers.enable(1);
+
 		this.scene.overrideMaterial = overrideMaterialValue;
 
 		this.material.uniforms.uNormals.value = this.normalBuffer.texture;
@@ -71,7 +78,6 @@ export class LinesPass extends Pass {
 			renderer.setRenderTarget(null);
 			this.fsQuad.render(renderer);
 		} else {
-			// throw Error("you don't think this ever happens but now it did!");
 			// needed for compositing multiple scenes
 			renderer.setRenderTarget(writeBuffer);
 			if (this.clear) renderer.clear();
