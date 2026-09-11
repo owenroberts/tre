@@ -1,26 +1,18 @@
 import * as THREE from 'three';
-
+import { SketchExample } from './sketch-example';
 import { SceneBuilder } from './scene-builder';
 import { getAnimatorParams } from './get-animator-params';
 import { Animator } from '../tre';
 
-export class AnimatorExample {
+export class AnimatorExample extends SketchExample {
 	constructor(sceneParams) {
-
-		this.scene = sceneParams.scene;
-		this.camera = sceneParams.camera;
-		this.renderer = sceneParams.renderer;
-
-		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-		this.debug = false;
+		super(sceneParams);
 
 		const builder = new SceneBuilder(this.scene);
 		builder.addGround();
 		builder.addLights();
 
-		this.cube = builder.addCube();
+		const cube = builder.addCube();
 		const sphere = builder.addSphere({ x: 2, s: 0.5 });
 
 		// recreate the cube animation with animator
@@ -29,8 +21,8 @@ export class AnimatorExample {
 			duration: 5,
 			mirror: false,
 			callback: value => {
-				this.cube.rotation.y = value;
-				this.cube.rotation.x = value;
+				cube.rotation.y = value;
+				cube.rotation.x = value;
 			}
 		});
 
@@ -45,22 +37,13 @@ export class AnimatorExample {
 		});
 	}
 
-	animate(time) {
-		if (!this.prevTime) this.prevTime = time;
-		const timeElapsed = time - this.prevTime;
-		this.prevTime = time;
-		const timeElapsedInSeconds = timeElapsed / 1000;
-
-		this.renderer.render( this.scene, this.camera );
-		
-		// this.cubeAnimator.update(timeElapsedInSeconds);
+	render(timeElapsedInSeconds) {
+		this.cubeAnimator.update(timeElapsedInSeconds);
 		this.sphereAnimator.update(timeElapsedInSeconds);
 	}
 
 	setupParams(panel) {
-
-		panel.addRef({ obj: this, ref: "debug", });
+		super.setupParams(panel);
 		getAnimatorParams(panel, this.sphereAnimator);
-		
 	}
 }

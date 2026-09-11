@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { SketchExample } from './sketch-example';
 import { SceneBuilder } from './scene-builder';
-import { ModelCat } from '../tre';
+import { Singer } from '../tre';
 
-export class ModelCatExample extends SketchExample {
+export class SingerExample extends SketchExample {
 	constructor(sceneParams) {
 		super(sceneParams);
 
@@ -12,22 +12,22 @@ export class ModelCatExample extends SketchExample {
 		this.camera.position.y = 5;
 		this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-		this.isWalking = true;
+		this.isSinging = true;
 
 		const builder = new SceneBuilder(this.scene);
 		builder.addGround({ y: 0 });
 		builder.addLights();
 
-		this.cat = new ModelCat({ scene: this.scene });
+		this.singer = new Singer({ scene: this.scene });
 
 	}
 
 	render(timeElapsedInSeconds) {
-		this.cat.update(timeElapsedInSeconds, this.isWalking);
+		this.singer.update(timeElapsedInSeconds, this.isSinging);
 	}
 
 	setupParams(panel) {
 		super.setupParams(panel);
-		panel.addRef({ obj: this, ref: "isWalking" });
+		panel.addRef({ obj: this, ref: "isSinging" });
 	}
 }

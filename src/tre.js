@@ -16,5 +16,6 @@ import { GeoCat } from './fauna/geo-cat';
 import { GeoPig } from './fauna/geo-pig';
 import { ModelCat } from './fauna/model-cat';
 import { Worm } from './fauna/worm';
+import { Singer } from './fauna/singer';
 
-export { Animator, Easings, Joint, BandShader, LinesPass, vertexShader, blendShader, Bird, Flock, FlockMember, Follower, BIRD_FLOCK_CONFIG, WORM_FLOCK_CONFIG, addLine, GeoCat, ModelCat, GeoPig, addTubeLine, addRandomLine, Worm };
+export { Animator, Easings, Joint, BandShader, LinesPass, vertexShader, blendShader, Bird, Flock, FlockMember, Follower, BIRD_FLOCK_CONFIG, WORM_FLOCK_CONFIG, addLine, GeoCat, ModelCat, GeoPig, addTubeLine, addRandomLine, Worm, Singer };

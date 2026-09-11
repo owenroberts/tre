@@ -21,6 +21,7 @@ import { SceneryExample } from '../examples/scenery-example';
 import { ParticlesExample } from '../examples/particles-example';
 import { WormExample } from '../examples/worm-example';
 import { WormFlockExample } from '../examples/worm-flock-example';
+import { SingerExample } from '../examples/singer-example';
 
 const exampleList = [
 	PostSketchy,
@@ -43,6 +44,7 @@ const exampleList = [
 	ParticlesExample,
 	WormExample,
 	WormFlockExample,
+	SingerExample,
 ];
 
 export class ExamplesPanel extends UIPanel {
