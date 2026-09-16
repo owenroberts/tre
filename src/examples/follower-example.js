@@ -3,7 +3,6 @@ import { SceneBuilder } from './scene-builder';
 import { Follower } from '../tre';
 import { SketchExample } from './sketch-example';
 
-
 /**
  * creates a follower
  * moves toward list of targets

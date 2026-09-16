@@ -1,17 +1,13 @@
 import * as THREE from 'three';
-
-import { setupPostProcessing, getSketchyParams } from './setup-post-processing';
+import { SketchExample } from './sketch-example';
 import { SceneBuilder } from './scene-builder';
 import { Globe } from '../fauna/globe';
 import { CameraController } from '../fauna/camera-controller';
 import { Animator } from '../tre';
 
-export class GlobeExample {
+export class GlobeExample extends SketchExample {
 	constructor(sceneParams) {
-
-		this.scene = sceneParams.scene;
-		this.camera = sceneParams.camera;
-		this.renderer = sceneParams.renderer;
+		super(sceneParams);
 
 		this.camera.position.x = 256;
 		this.camera.position.z = 256;
@@ -22,32 +18,17 @@ export class GlobeExample {
 
 		this.camera.lookAt(this.origin);
 
-		this.debug = false;
-
 		this.builder = new SceneBuilder(this.scene);
 		this.builder.addLights();
 
-		const post = setupPostProcessing({
-			scene: this.scene, 
-			camera: this.camera,
-			renderer: this.renderer,
-		});
-
-		this.composer = post.composer;
-
 		this.globe = new Globe({ worldRadius: 128, scene: this.scene });
 		this.elements = [];
-		this.cc = new CameraController(this.camera, false);
-
+		this.cc = new CameraController({ camera: this.camera });
 	}
 
-	animate(time) {
-		if (!this.prevTime) this.prevTime = time;
-		const timeElapsed = time - this.prevTime;
-		this.prevTime = time;
-		const timeElapsedInSeconds = timeElapsed / 1000;
+	render(timeElapsedInSeconds) {
 
-		this.cc.update();
+		this.cc.update(timeElapsedInSeconds);
 		this.camera.lookAt(this.origin);
 
 		for (let i = 0; i < this.elements.length; i++) {
@@ -55,9 +36,6 @@ export class GlobeExample {
 				this.elements[i].animator.update(timeElapsedInSeconds);
 			}
 		}
-
-		if (this.debug) this.renderer.render(this.scene, this.camera);
-		else this.composer.render();
 	}
 
 	addCube(vertex, size, addAnimator) {
@@ -87,8 +65,8 @@ export class GlobeExample {
 	}
 
 	setupParams(panel) {
+		super.setupParams(panel);
 
-		panel.addRef({ obj: this, ref: "debug", });
 		panel.addBreak();
 		panel.addButton({
 			text: "add random cube",
